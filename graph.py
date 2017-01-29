@@ -1,6 +1,7 @@
 from math import ceil, floor
 from colorama import Fore, Style
 
+
 class Candle:
     UP_MOVE = 1
     DOWN_MOVE = -1
@@ -33,6 +34,7 @@ class Candle:
             return self.DOWN_MOVE
         else:
             return self.UP_MOVE
+
 
 class CandleStickGraph:
     SYMBOL_STICK = "│"
@@ -74,11 +76,11 @@ class CandleStickGraph:
         bs = self._to_height_units(candle.bottom_stick)
         bc = self._to_height_units(candle.bottom_candle)
 
-        if height_unit <= ceil(ts) and height_unit >= floor(tc):
-            if (tc - height_unit > 0.75):
+        if ceil(ts) >= height_unit >= floor(tc):
+            if tc - height_unit > 0.75:
                 return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
             elif (tc - height_unit) > 0.25:
-                if (ts - height_unit > 0.75):
+                if (ts - height_unit) > 0.75:
                     return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_TOP
                 else:
                     return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_CANDLE_TOP
@@ -89,9 +91,9 @@ class CandleStickGraph:
                     return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_HALF_STICK_TOP
                 else:
                     return self.SYMBOL_NOTHING
-        elif height_unit <= ceil(tc) and height_unit >= floor(bc):
+        elif floor(tc) >= height_unit >= ceil(bc):
             return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
-        elif height_unit <= ceil(bc) and height_unit >= floor(bs):
+        elif ceil(bc) >= height_unit >= floor(bs):
             if (bc - height_unit) < 0.25:
                 return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
             elif (bc - height_unit) < 0.75:
@@ -109,14 +111,15 @@ class CandleStickGraph:
         else:
             return self.SYMBOL_NOTHING
 
-    def draw(self, colorize: bool=True) -> str:
+    def draw(self, colorize: bool = True) -> str:
         output_str = "\n"
         for y in reversed(range(0, self._height)):
             if y % 4 == 0:
-                output_str += Style.RESET_ALL if colorize else "" + "{:8.2f} ".format(self._global_min_value + (y * (self._global_max_value - self._global_min_value) / self._height))
+                output_str += Style.RESET_ALL if colorize else "" + "{:8.2f} ".format(
+                    self._global_min_value + (y * (self._global_max_value - self._global_min_value) / self._height))
             else:
                 output_str += "         "
             for c in self._data:
                 output_str += self._render_candle_at(c, y, colorize)
-            output_str += "\n" + (Style.RESET_ALL  if colorize else "")
+            output_str += "\n" + (Style.RESET_ALL if colorize else "")
         return output_str
