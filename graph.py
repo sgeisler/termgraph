@@ -78,34 +78,34 @@ class CandleStickGraph:
 
         if ceil(ts) >= height_unit >= floor(tc):
             if tc - height_unit > 0.75:
-                return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
+                return (self._candle_color(candle) if colorize else "") + self.SYMBOL_CANDLE
             elif (tc - height_unit) > 0.25:
                 if (ts - height_unit) > 0.75:
-                    return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_TOP
+                    return (self._candle_color(candle) if colorize else "") + self.SYMBOL_HALF_TOP
                 else:
-                    return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_CANDLE_TOP
+                    return (self._candle_color(candle) if colorize else "") + self.SYMBOL_HALF_CANDLE_TOP
             else:
                 if (ts - height_unit) > 0.75:
-                    return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_STICK
+                    return (self.COLOR_NEUTRAL if colorize else "") + self.SYMBOL_STICK
                 elif (ts - height_unit) > 0.25:
-                    return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_HALF_STICK_TOP
+                    return (self.COLOR_NEUTRAL if colorize else "") + self.SYMBOL_HALF_STICK_TOP
                 else:
                     return self.SYMBOL_NOTHING
         elif floor(tc) >= height_unit >= ceil(bc):
-            return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
+            return (self._candle_color(candle) if colorize else "") + self.SYMBOL_CANDLE
         elif ceil(bc) >= height_unit >= floor(bs):
             if (bc - height_unit) < 0.25:
-                return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
+                return (self._candle_color(candle) if colorize else "") + self.SYMBOL_CANDLE
             elif (bc - height_unit) < 0.75:
                 if (bs - height_unit) < 0.25:
-                    return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_BOTTOM
+                    return (self._candle_color(candle) if colorize else "") + self.SYMBOL_HALF_BOTTOM
                 else:
-                    return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_CANDLE_BOTTOM
+                    return (self._candle_color(candle) if colorize else "") + self.SYMBOL_HALF_CANDLE_BOTTOM
             else:
                 if (bs - height_unit) < 0.25:
-                    return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_STICK
+                    return (self.COLOR_NEUTRAL if colorize else "") + self.SYMBOL_STICK
                 elif (bs - height_unit) < 0.75:
-                    return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_HALF_STICK_BOTTOM
+                    return (self.COLOR_NEUTRAL if colorize else "") + self.SYMBOL_HALF_STICK_BOTTOM
                 else:
                     return self.SYMBOL_NOTHING
         else:
@@ -115,7 +115,7 @@ class CandleStickGraph:
         output_str = "\n"
         for y in reversed(range(0, self._height)):
             if y % 4 == 0:
-                output_str += Style.RESET_ALL if colorize else "" + "{:8.2f} ".format(
+                output_str += (Style.RESET_ALL if colorize else "") + "{:8.2f} ".format(
                     self._global_min_value + (y * (self._global_max_value - self._global_min_value) / self._height))
             else:
                 output_str += "         "
