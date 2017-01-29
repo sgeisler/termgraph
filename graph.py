@@ -65,7 +65,7 @@ class CandleStickGraph:
         else:
             return self.COLOR_NEGATIVE
 
-    def _render_candle_at(self, candle: Candle, height_unit: int) -> str:
+    def _render_candle_at(self, candle: Candle, height_unit: int, colorize: bool) -> str:
         height_unit = float(height_unit)
 
         ts = self._to_height_units(candle.top_stick)
@@ -76,47 +76,47 @@ class CandleStickGraph:
 
         if height_unit <= ceil(ts) and height_unit >= floor(tc):
             if (tc - height_unit > 0.75):
-                return self._candle_color(candle) + self.SYMBOL_CANDLE
+                return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
             elif (tc - height_unit) > 0.25:
                 if (ts - height_unit > 0.75):
-                    return self._candle_color(candle) + self.SYMBOL_HALF_TOP
+                    return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_TOP
                 else:
-                    return self._candle_color(candle) + self.SYMBOL_HALF_CANDLE_TOP
+                    return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_CANDLE_TOP
             else:
                 if (ts - height_unit) > 0.75:
-                    return self.COLOR_NEUTRAL + self.SYMBOL_STICK
+                    return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_STICK
                 elif (ts - height_unit) > 0.25:
-                    return self.COLOR_NEUTRAL + self.SYMBOL_HALF_STICK_TOP
+                    return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_HALF_STICK_TOP
                 else:
                     return self.SYMBOL_NOTHING
         elif height_unit <= ceil(tc) and height_unit >= floor(bc):
-            return self._candle_color(candle) + self.SYMBOL_CANDLE
+            return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
         elif height_unit <= ceil(bc) and height_unit >= floor(bs):
             if (bc - height_unit) < 0.25:
-                return self._candle_color(candle) + self.SYMBOL_CANDLE
+                return self._candle_color(candle) if colorize else "" + self.SYMBOL_CANDLE
             elif (bc - height_unit) < 0.75:
                 if (bs - height_unit) < 0.25:
-                    return self._candle_color(candle) + self.SYMBOL_HALF_BOTTOM
+                    return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_BOTTOM
                 else:
-                    return self._candle_color(candle) + self.SYMBOL_HALF_CANDLE_BOTTOM
+                    return self._candle_color(candle) if colorize else "" + self.SYMBOL_HALF_CANDLE_BOTTOM
             else:
                 if (bs - height_unit) < 0.25:
-                    return self.COLOR_NEUTRAL + self.SYMBOL_STICK
+                    return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_STICK
                 elif (bs - height_unit) < 0.75:
-                    return self.COLOR_NEUTRAL + self.SYMBOL_HALF_STICK_BOTTOM
+                    return self.COLOR_NEUTRAL if colorize else "" + self.SYMBOL_HALF_STICK_BOTTOM
                 else:
                     return self.SYMBOL_NOTHING
         else:
             return self.SYMBOL_NOTHING
 
-    def draw(self) -> str:
+    def draw(self, colorize: bool=True) -> str:
         output_str = "\n"
         for y in reversed(range(0, self._height)):
             if y % 4 == 0:
-                output_str += Style.RESET_ALL + "{:8.2f} ".format(self._global_min_value + (y * (self._global_max_value - self._global_min_value) / self._height))
+                output_str += Style.RESET_ALL if colorize else "" + "{:8.2f} ".format(self._global_min_value + (y * (self._global_max_value - self._global_min_value) / self._height))
             else:
                 output_str += "         "
             for c in self._data:
-                output_str += self._render_candle_at(c, y)
-            output_str += "\n" + Style.RESET_ALL
+                output_str += self._render_candle_at(c, y, colorize)
+            output_str += "\n" + (Style.RESET_ALL  if colorize else "")
         return output_str
