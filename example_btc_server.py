@@ -21,7 +21,7 @@ class Range:
 
 def get_bitstamp_transactions(timespan: str = "day") -> List[Tuple[int, float]]:
     raw_transactions = list(json.loads(requests.get(BITSTAMP_TX_API.format(timespan)).text))
-    return [(int(entry['date']), float(entry['price'])) for entry in raw_transactions]
+    return [(int(entry['date']), float(entry['price'])) for entry in reversed(raw_transactions)]
 
 
 def group_transactions_by_timestamp(
@@ -45,6 +45,6 @@ if __name__ == "__main__":
     now = int(time())
     data = get_bitstamp_transactions()
     p = group_transactions_by_timestamp(data, now - DAYS_SECONDS, now, 100)
-    c = [transactions_to_candles(tx_set) for tx_set in reversed(p)]
+    c = [transactions_to_candles(tx_set) for tx_set in p]
     g = CandleStickGraph(c, 40)
     print(g.draw())
