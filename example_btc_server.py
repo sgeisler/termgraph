@@ -42,6 +42,12 @@ def render_graph(width: int, height: int, colored: bool) -> str:
         bitstamp_data = get_bitstamp_transactions()
     p = group_transactions_by_timestamp(bitstamp_data, now - DAYS_SECONDS, now, width - 9)
     c = [transactions_to_candles(tx_set) for tx_set in p]
+
+    prev_end = c[0].end_value
+    for index, candle in enumerate(c[1:]):
+        c[index+1].begin_value = prev_end
+        prev_end = candle.end_value
+
     g = CandleStickGraph(c, height - 3)
 
     min_val = min([candle.min_value for candle in c])
