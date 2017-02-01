@@ -99,7 +99,7 @@ class ChartRequestHandler(socketserver.BaseRequestHandler):
         self.request.sendall(render_graph(width, height, color).encode('utf-8'))
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 1234
+    HOST, PORT = "0.0.0.0", 1234
 
     server = socketserver.TCPServer((HOST, PORT), ChartRequestHandler)
     try:
