@@ -60,7 +60,7 @@ def render_graph(width: int, height: int, colored: bool) -> str:
 
     legend = "24h | min = {:.2f} | max = {:.2f} | curr = {:.2f} | diff = {:+.2f}".format(min_val, max_val, last, diff)
     out +=  " " * int((width - len(legend)) / 2)
-    out += legend
+    out += legend + "\n"
     return out
 
 def str2bool(v):
