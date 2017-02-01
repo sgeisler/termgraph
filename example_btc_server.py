@@ -6,18 +6,13 @@ from typing import List, Tuple, Dict
 from itertools import groupby
 from time import time
 from graph import Candle, CandleStickGraph
+import socketserver
 
 BITSTAMP_TX_API = "https://www.bitstamp.net/api/v2/transactions/btcusd/?time={}"
 DAYS_SECONDS = 24 * 60 * 60
 
-class Range:
-    def __init__(self, min: int, max: int) -> None:
-        self.min = min
-        self.max = max
-
-    def __contains__(self, item):
-        return self.min <= item <= self.max
-
+bitstamp_data = None
+last_fetch = 0
 
 def get_bitstamp_transactions(timespan: str = "day") -> List[Tuple[int, float]]:
     raw_transactions = list(json.loads(requests.get(BITSTAMP_TX_API.format(timespan)).text))
@@ -33,18 +28,75 @@ def group_transactions_by_timestamp(
     return [list(group[1]) for group in grouped]
 
 
-def transactions_to_candles(transactions: List[Tuple[int, float]]):
+def transactions_to_candles(transactions: List[Tuple[int, float]]) -> Candle:
     start = transactions[0][1]
     end = transactions[-1][1]
     min_val = min(transactions, key=lambda tx: tx[1])[1]
     max_val = max(transactions, key=lambda tx: tx[1])[1]
     return Candle(min_val, max_val, start, end)
 
+def render_graph(width: int, height: int, colored: bool) -> str:
+    global bitstamp_data
+    now = int(time())
+    if (bitstamp_data is None) or (last_fetch < time() - 10):
+        bitstamp_data = get_bitstamp_transactions()
+    p = group_transactions_by_timestamp(bitstamp_data, now - DAYS_SECONDS, now, width - 9)
+    c = [transactions_to_candles(tx_set) for tx_set in p]
+    g = CandleStickGraph(c, height - 3)
+
+    min_val = min([candle.min_value for candle in c])
+    max_val = max([candle.max_value for candle in c])
+    last = c[-1].end_value
+    diff = last - c[0].begin_value
+
+    out = g.draw(colored)
+    out += "\n"
+
+    legend = "24h | min = {:.2f} | max = {:.2f} | curr = {:.2f} | diff = {:+.2f}".format(min_val, max_val, last, diff)
+    out +=  " " * int((width - len(legend)) / 2)
+    out += legend
+    return out
+
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
+
+class ChartRequestHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+
+        #print("got request from {}".format(self.request.))
+
+        width = 80
+        height = 43
+        color = True
+
+        args = self.request.recv(128).decode('ascii', 'ignore').split(" ")
+
+        if len(args) >= 1:
+            try:
+                width_inp = int(args[0])
+                if 10 <= width_inp <= 1024:
+                    width = width_inp
+            except Exception: pass
+
+        if len(args) >= 2:
+            try:
+                height_inp = int(args[1])
+                if 10 <= height_inp <= 1024:
+                    height = height_inp
+            except Exception: pass
+
+        if len(args) >= 3:
+            try:
+                color = str2bool(args[2])
+            except Exception: pass
+
+        self.request.sendall(render_graph(width, height, color).encode('utf-8'))
 
 if __name__ == "__main__":
-    now = int(time())
-    data = get_bitstamp_transactions()
-    p = group_transactions_by_timestamp(data, now - DAYS_SECONDS, now, 100)
-    c = [transactions_to_candles(tx_set) for tx_set in p]
-    g = CandleStickGraph(c, 40)
-    print(g.draw())
+    HOST, PORT = "localhost", 1234
+
+    server = socketserver.TCPServer((HOST, PORT), ChartRequestHandler)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.shutdown()
