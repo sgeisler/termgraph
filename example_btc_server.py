@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
 import json
+from threading import Thread
+
 import requests
 from typing import List, Tuple, Dict
 from itertools import groupby
@@ -35,11 +37,24 @@ def transactions_to_candles(transactions: List[Tuple[int, float]]) -> Candle:
     max_val = max(transactions, key=lambda tx: tx[1])[1]
     return Candle(min_val, max_val, start, end)
 
-def render_graph(width: int, height: int, colored: bool) -> str:
+def update_cache() -> None:
     global bitstamp_data
-    now = int(time())
-    if (bitstamp_data is None) or (last_fetch < time() - 10):
+    global last_fetch
+    def fetch_updates():
+        global bitstamp_data
+        global last_fetch
         bitstamp_data = get_bitstamp_transactions()
+        last_fetch = int(time())
+        print("updated cache")
+
+    if bitstamp_data is None:
+        fetch_updates()
+    elif last_fetch < (time() - 10):
+        Thread(target=fetch_updates).start()
+
+def render_graph(width: int, height: int, colored: bool) -> str:
+    update_cache()
+    now = int(time())
     p = group_transactions_by_timestamp(bitstamp_data, now - DAYS_SECONDS, now, width - 9)
     c = [transactions_to_candles(tx_set) for tx_set in p]
 
