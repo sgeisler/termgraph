@@ -6,7 +6,7 @@ class Candle:
     UP_MOVE = 1
     DOWN_MOVE = -1
 
-    def __init__(self, min_value: float, max_value: float, begin_value: float, end_value: float):
+    def __init__(self, begin_value: float, max_value: float, min_value: float, end_value: float):
         self.min_value = float(min_value)
         self.max_value = float(max_value)
         self.begin_value = float(begin_value)
