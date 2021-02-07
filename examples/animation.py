@@ -3,7 +3,7 @@
 import os
 from termgraph import CandleStickGraph
 from time import sleep
-from examples import load_data
+from utils import load_data
 
 
 def main():
