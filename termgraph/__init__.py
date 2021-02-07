@@ -1,5 +1,6 @@
 from math import ceil, floor
 from colorama import Fore, Style
+from typing import List
 
 __version__ = '0.1.0'
 
@@ -53,7 +54,7 @@ class CandleStickGraph:
     COLOR_POSITIVE = Style.BRIGHT + Fore.GREEN
     COLOR_NEGATIVE = Style.BRIGHT + Fore.RED
 
-    def __init__(self, data: [Candle], height: int):
+    def __init__(self, data: List[Candle], height: int):
         self._height = height
         self._data = data
 

@@ -1,8 +1,9 @@
 import csv
 from termgraph import Candle
+from typing import List
 
 
-def load_data(file: str) -> [Candle]:
+def load_data(file: str) -> List[Candle]:
     with open(file) as csvfile:
         reader = csv.reader(csvfile, delimiter=",")
         next(reader)  # skip first row
