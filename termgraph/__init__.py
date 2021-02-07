@@ -3,6 +3,7 @@ from colorama import Fore, Style
 
 __version__ = '0.1.0'
 
+
 class Candle:
     UP_MOVE = 1
     DOWN_MOVE = -1
