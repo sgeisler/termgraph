@@ -1,5 +1,5 @@
 from unittest import TestCase
-from graph import CandleStickGraph, Candle
+from termgraph import CandleStickGraph, Candle
 
 class BloomfilterTest(TestCase):
     def test_candle_int_4(self):
